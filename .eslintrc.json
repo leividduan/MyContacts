@@ -1,0 +1,30 @@
+{
+  "env": {
+    "node": true,
+    "browser": true,
+    "es2021": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb", "plugin:react-hooks/recommended"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2021,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-hooks"],
+  "rules": {
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "import/prefer-default-export": "off",
+    "object-curly-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "operator-linebreak": "off",
+    "react/jsx-no-bind": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "class-methods-use-this": "off",
+    "no-empty": ["error", { "allowEmptyCatch": true }]
+  }
+}
