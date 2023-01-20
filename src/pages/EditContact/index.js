@@ -1,5 +1,5 @@
 import { useHistory, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import ContactsService from '../../services/ContactsService';
 
@@ -10,6 +10,8 @@ import toast from '../../utils/toast';
 
 export default function EditContact() {
   const [isLoading, setIsLoading] = useState(true);
+  const [contactName, setContactName] = useState('');
+  const contactFormRef = useRef(null);
 
   const { id } = useParams();
   const history = useHistory();
@@ -17,9 +19,10 @@ export default function EditContact() {
   useEffect(() => {
     async function loadContact() {
       try {
-        const contactData = await ContactsService.getContactById(id);
-        console.log(contactData);
+        const contact = await ContactsService.getContactById(id);
+        contactFormRef.current.setFieldsValues(contact);
         setIsLoading(false);
+        setContactName(contact.name);
       } catch {
         history.push('/');
         toast({ type: 'danger', text: 'Contato não encontrado!' });
@@ -29,15 +32,30 @@ export default function EditContact() {
     loadContact();
   }, [id, history]);
 
-  function handleSubmit() {
-    //
+  async function handleSubmit(formData) {
+    try {
+      const contact = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        category_id: formData.categoryId,
+      };
+
+      const contactData = await ContactsService.updateContact(id, contact);
+
+      setContactName(contactData.name);
+
+      toast({ type: 'success', text: 'Contato editado com sucesso!' });
+    } catch {
+      toast({ type: 'danger', text: 'Ocorreu um erro ao editar o contato!' });
+    }
   }
 
   return (
     <>
       <Loader isLoading={isLoading} />
-      <PageHeader title="Editar" />
-      <ContactForm buttonLabel="Salvar alterações" onSubmit={handleSubmit} />
+      <PageHeader title={isLoading ? 'Carregando...' : `Editar ${contactName}`} />
+      <ContactForm ref={contactFormRef} buttonLabel="Salvar alterações" onSubmit={handleSubmit} />
     </>
   );
 }
