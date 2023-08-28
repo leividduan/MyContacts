@@ -1,8 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable max-len */
-
-
 import { Container } from './styles';
 
 import Loader from '../../components/Loader';
@@ -36,12 +34,19 @@ export default function Home() {
     handleDeleteContact,
   } = useHome();
 
+  const hasContacts = contacts.length > 0;
+  const isListEmpty = !hasError && (!isLoading && !hasContacts);
+  const isSearchEmpty = !hasError && (hasContacts && filteredContacts.length < 1);
+
   return (
     <Container>
       <Loader isLoading={isLoading} />
 
-      {contacts.length > 0 && (
-        <InputSearch value={searchTerm} onChange={handleChangeSearchTerm} />
+      {hasContacts && (
+        <InputSearch
+          value={searchTerm}
+          onChange={handleChangeSearchTerm}
+        />
       )}
 
       <Header
@@ -51,17 +56,11 @@ export default function Home() {
       />
 
       {hasError && <ErrorStatus onTryAgain={handleTryAgain} />}
+      {isListEmpty && <EmptyList />}
+      {isSearchEmpty && <SearchNotFound value={searchTerm} />}
 
-      {!hasError && (
+      {hasContacts && (
         <>
-          {contacts.length < 1 && !isLoading && (
-            <EmptyList />
-          )}
-
-          {contacts.length > 0 && filteredContacts.length < 1 && (
-            <SearchNotFound value={searchTerm} />
-          )}
-
           <ContactsList
             filteredContacts={filteredContacts}
             orderBy={orderBy}
@@ -69,17 +68,17 @@ export default function Home() {
             onDeleteContact={handleDeleteContact}
           />
 
-        <Modal
-          danger
-          isLoading={isLoadingDelete}
-          visible={isDeleteModalVisible}
-          title={`Tem certeza que deseja remover o contato "${contactBeingDeleted?.name}"?`}
-          confirmLabel="Deletar"
-          onCancel={handleCloseDeleteModal}
-          onConfirm={handleConfirmDeleteContact}
-        >
-          <p>Esta ação não poderá ser desfeita!</p>
-        </Modal>
+          <Modal
+            danger
+            isLoading={isLoadingDelete}
+            visible={isDeleteModalVisible}
+            title={`Tem certeza que deseja remover o contato "${contactBeingDeleted?.name}"?`}
+            confirmLabel="Deletar"
+            onCancel={handleCloseDeleteModal}
+            onConfirm={handleConfirmDeleteContact}
+          >
+            <p>Esta ação não poderá ser desfeita!</p>
+          </Modal>
         </>
       )}
     </Container>
